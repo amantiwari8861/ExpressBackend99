@@ -1,4 +1,5 @@
 const User = require("../model/user.model");
+const { hashPassword } = require("../utils/hash");
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -35,6 +36,8 @@ exports.getUserByEmail = async (req, res) => {
 exports.addUser = async (req, res) => {
   const user = req.body;
   try {
+    const hashedPassword = await hashPassword(user.password);
+    user.password = hashedPassword;
     const newUser = new User(user);
     const savedUser = await newUser.save();
     const userDto = { ...savedUser._doc }; // Convert Mongoose document to plain JavaScript object

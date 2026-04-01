@@ -6,7 +6,6 @@ const authRouter = require("express").Router();
 
 authRouter.post("/auth/login", async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const user = await User.findOne({ email });
     if (!user) {
@@ -17,6 +16,12 @@ authRouter.post("/auth/login", async (req, res) => {
       return res.status(401).json({ error: "Invalid Password!" });
     }
     const token = await generateToken(user);
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
     res.json({ token });
   } catch (err) {
     res.status(500).json({ error: err.message });

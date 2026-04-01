@@ -1,38 +1,51 @@
 const jwt = require("jsonwebtoken");
 
 function authMiddleware(req, res, next) {
-  console.log("Authenticating .....");
+  console.log("Authenticating...");
+
   try {
-    // Authorization Header
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      return res
-        .status(401)
-        .json({ error: "Unauthorized kindly provide Authorization Header" });
+    let token;
+
+    // ✅ 1. Try cookie first (primary)
+    if (req.cookies && req.cookies.token) {
+      token = req.cookies.token;
     }
-    const token = authHeader.split(" ")[1]; // Bearer token
+
+    // ✅ 2. Optional fallback to Authorization header
+    if (!token && req.headers.authorization) {
+      const authHeader = req.headers.authorization;
+      token = authHeader.split(" ")[1];
+    }
+
+    // ❌ No token found
     if (!token) {
-      return res
-        .status(401)
-        .json({
-          error: "Unauthorized kindly provide token in Authorization Header",
-        });
+      return res.status(401).json({
+        error: "Unauthorized: No token provided",
+      });
     }
+
+    // ✅ Verify token
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decodedToken; // {email:"aman@gmail.com",id:"123",role:"ROLE_USER"}
-    next(); // call next middleware or route handler
+
+    req.user = decodedToken; // {id, email, role}
+    next();
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return res.status(401).json({
+      error: "Invalid or expired token",
+    });
   }
 }
-const generateToken = async (user) => {
+
+const generateToken = (user) => {
   const payload = {
     id: user._id,
     email: user.email,
     role: user.role,
   };
-  const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
-  return token;
+
+  return jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: "1h",
+  });
 };
 
 module.exports = { authMiddleware, generateToken };

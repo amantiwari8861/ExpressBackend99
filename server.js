@@ -10,11 +10,14 @@ const server = express();
 
 const PORT = process.env.PORT || 8080;
 const HOST = process.env.HOST || "localhost";
-
+const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const { authMiddleware } = require("./middlewares/auth.middleware");
 const { loggingMiddleware } = require("./middlewares/logging.middleware");
 const corsOptions = require("./config/cors.config");
+
+server.use(express.urlencoded({ extended: true }));
+server.use(cookieParser());
 server.use(cors(corsOptions));
 server.use(morgan("dev"));
 // server.use(loggingMiddleware);

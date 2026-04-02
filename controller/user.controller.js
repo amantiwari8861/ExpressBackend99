@@ -28,6 +28,8 @@ exports.getUserByEmail = async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
+    delete user.password;
+    delete user.__v;
     res.json(user);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch user" });
@@ -76,18 +78,3 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ error: "Failed to delete user" });
   }
 };
-
-// yogender 21532
-// W/D Am Node@1
-// keshav 20102
-// Himanshu 21541
-// satyaprakash 22053
-// ritu 21491
-// dilshad 20425
-// arnav 21309
-// kritesh 21050
-// Bhupender 20742
-// Paramjeet Singh 21919
-// sukhmanpreet 21969
-// Priya arora 20101
-// akash 21973

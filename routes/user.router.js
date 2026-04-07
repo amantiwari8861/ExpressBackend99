@@ -19,8 +19,8 @@ userRouter.post("/", addUser); // http://127.0.0.1:5000/api/v1/users
 
 userRouter.use(authMiddleware);
 userRouter.get("/", getAllUsers); // http://127.0.0.1:5000/api/v1/users
-userRouter.get("/:id", getUserById); // http://127.0.0.1:5000/api/v1/users/100
 userRouter.get("/email/:email", getUserByEmail); // http://127.0.0.1:5000/api/v1/users/email/john@example.com
+userRouter.get("/:id", getUserById); // http://127.0.0.1:5000/api/v1/users/100
 userRouter.put("/:id", updateUser); // http://127.0.0.1:5000/api/v1/users/100
 userRouter.delete("/:id", deleteUser); // http://127.0.0.1:5000/api/v1/users/100
 

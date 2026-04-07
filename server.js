@@ -15,6 +15,7 @@ const morgan = require("morgan");
 const { authMiddleware } = require("./middlewares/auth.middleware");
 const { loggingMiddleware } = require("./middlewares/logging.middleware");
 const corsOptions = require("./config/cors.config");
+const paymentRouter = require("./routes/payments.routes");
 
 server.use(express.urlencoded({ extended: true }));
 server.use(cookieParser());
@@ -30,6 +31,8 @@ server.get("/", (req, res) => {
 });
 server.use("/api/v1/users", userRouter);
 server.use(authRouter);
+server.use("/api/payment", paymentRouter);
+
 
 server.listen(PORT, HOST, () => {
   console.log(`listening on http://${HOST}:${PORT}`);
@@ -39,3 +42,15 @@ mongoose
   .connect(process.env.MONGO_URI)
   .then((mongo) => console.log(`connected to ${mongo.connections[0].host}`))
   .catch((err) => console.log(err.message));
+
+server.use((err, req, res, next) => {
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error"
+  });
+});
+
+process.on("SIGINT", async () => {
+  await mongoose.connection.close();
+  process.exit(0);
+});
